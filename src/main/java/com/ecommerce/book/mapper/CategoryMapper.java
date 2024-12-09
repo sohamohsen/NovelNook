@@ -5,6 +5,7 @@ import com.ecommerce.book.entity.Book;
 import com.ecommerce.book.entity.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -17,12 +18,12 @@ public interface CategoryMapper {
 
     ResponseCategoryDTO toDTO(Category category);
 
-    Category toUpdateEntity(UpdateCategoryDTO updateCategoryDTO);
+    void toUpdateEntity(UpdateCategoryDTO updateCategoryDTO, @MappingTarget Category category);
 
     // Map Category entity to CategoryWithBooksDTO
     @Mapping(target = "books", source = "books") // Map books to ResponseBookDTO list
     CategoryWithBooksDTO toCategoryWithBooksDTO(Category category);
 
     // Map Book entity to ResponseBookDTO
-    List<ResponseCategoryDTO> toResponseCategoryDTOList(List<Category> categories);
+    List<ResponseCategoryDTO> toDTO(List<Category> categories);
 }

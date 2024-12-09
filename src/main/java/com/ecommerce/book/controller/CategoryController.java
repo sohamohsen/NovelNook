@@ -26,13 +26,13 @@ public class CategoryController {
         return ResponseEntity.ok(categoryDTO);
     }
 
-    @PutMapping("/changecategory/{id}")
+    @PutMapping("/updater/{id}")
     public ResponseEntity<ResponseCategoryDTO> changeCategory(@PathVariable int id, @RequestBody UpdateCategoryDTO category) {
         ResponseCategoryDTO categoryDTO = categoryService.updateCategory(id, category);
         return ResponseEntity.ok(categoryDTO);
     }
 
-    @GetMapping("/getcategory/{id}")
+    @GetMapping("/category/{id}")
     public ResponseEntity<Optional<ResponseCategoryDTO>> getCategory(@PathVariable int id) {
         Optional<ResponseCategoryDTO> categoryDTO = Optional.ofNullable(categoryService.getCategoryById(id));
         return ResponseEntity.ok(categoryDTO);

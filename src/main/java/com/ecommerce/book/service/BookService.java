@@ -1,22 +1,18 @@
 package com.ecommerce.book.service;
 
-import com.ecommerce.book.dto.CreateBookDTO;
-import com.ecommerce.book.dto.ResponseBookDTO;
-import com.ecommerce.book.dto.ResponseCategoryDTO;
-import com.ecommerce.book.dto.UpdateBookDTO;
+import com.ecommerce.book.dto.*;
 import com.ecommerce.book.entity.Book;
-import com.ecommerce.book.entity.Category;
+import com.ecommerce.book.entity.User;
 import com.ecommerce.book.mapper.BookMapper;
-import com.ecommerce.book.mapper.CategoryMapper;
+import com.ecommerce.book.mapper.UserMapper;
 import com.ecommerce.book.repository.BookRepo;
 import com.ecommerce.book.repository.CategoryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class BookService {
@@ -24,42 +20,6 @@ public class BookService {
     private BookRepo bookRepo;
     @Autowired
     private CategoryRepo categoryRepo;
-
-    public ResponseBookDTO updateBook(int id, UpdateBookDTO book) {
-        if (id <= 0) {
-            throw new IllegalArgumentException("Book ID must be greater than zero.");
-        }
-
-        // Find the book by ID
-        Book bookToUpdate = bookRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + id));
-
-        // Fetch the Category entity
-        Category category = categoryRepo.findById(book.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + book.getCategoryId()));
-
-        // Update the book fields
-        bookToUpdate.setTitle(book.getTitle());
-        bookToUpdate.setAuthor(book.getAuthor());
-        bookToUpdate.setPrice(book.getPrice());
-        bookToUpdate.setPublisher(book.getPublisher());
-        bookToUpdate.setDescription(book.getDescription());
-        bookToUpdate.setPublishYear(book.getPublishYear());
-        bookToUpdate.setCategory(category); // Set the Category entity
-
-        // Save the updated book
-        Book updatedBook = bookRepo.save(bookToUpdate);
-
-        // Map and return the updated book as DTO
-        return BookMapper.instance.toDTO(updatedBook);
-    }
-
-
-
-    public List<ResponseBookDTO> getAllBooks() {
-        List<Book> books = bookRepo.findAll();
-        return BookMapper.instance.toDTOList(books);
-    }
 
     public ResponseBookDTO addBook(CreateBookDTO book) {
         if (book.getTitle() == null || book.getAuthor() == null || book.getPrice()<1 || book.getStock()<1) {
@@ -71,6 +31,100 @@ public class BookService {
         }
         Book newBook = BookMapper.instance.toEntity(book);
         return BookMapper.instance.toDTO(bookRepo.save(newBook));
+    }
+
+    public ResponseBookDTO updateBook(int id, UpdateBookDTO book) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("There is no data");
+        }
+        if (book == null) {
+            throw new IllegalArgumentException("There is no data");
+        }
+
+        Book existingBook = bookRepo.findById(id).orElse(null);
+        if (existingBook == null) {
+            throw new IllegalArgumentException("There is no book with this id");
+        }
+
+        UpdateBookDTO updateBook = BookMapper.instance.toUpdateDTO(existingBook);
+
+        if (updateBook == null) {
+            throw new IllegalArgumentException("There is no book with this id");
+        } else {
+            // Check and handle title update
+            if (book.getTitle() == null || book.getTitle().isEmpty() || book.getTitle().equals(updateBook.getTitle())) {
+                System.out.println("Book title is either empty or unchanged, skipping update.");
+            } else {
+                updateBook.setTitle(book.getTitle());
+            }
+
+            // Check and handle author update
+            if (book.getAuthor() == null || book.getAuthor().isEmpty() || book.getAuthor().equals(updateBook.getAuthor())) {
+                System.out.println("Book author is either empty or unchanged, skipping update.");
+            } else {
+                updateBook.setAuthor(book.getAuthor());
+            }
+
+            // Check and handle description update
+            if (book.getDescription() == null || book.getDescription().isEmpty() || book.getDescription().equals(updateBook.getDescription())) {
+                System.out.println("Book description is either empty or unchanged, skipping update.");
+            } else {
+                updateBook.setDescription(book.getDescription());
+            }
+
+            // Check and handle price update
+            if (book.getPrice() == 0 || book.getPrice() == updateBook.getPrice()) {
+                System.out.println("Book price is either zero or unchanged, skipping update.");
+            } else {
+                updateBook.setPrice(book.getPrice());
+            }
+
+            // Check and handle stock update
+            if (book.getStock() == 0 || book.getStock() == updateBook.getStock()) {
+                System.out.println("Book stock is either zero or unchanged, skipping update.");
+            } else {
+                updateBook.setStock(book.getStock());
+            }
+
+            // Check and handle cover_image_url update
+            if (book.getCover_image_url() == null || book.getCover_image_url().isEmpty() || book.getCover_image_url().equals(updateBook.getCover_image_url())) {
+                System.out.println("Book cover image URL is either empty or unchanged, skipping update.");
+            } else {
+                updateBook.setCover_image_url(book.getCover_image_url());
+            }
+
+            // Check and handle publishYear update
+            if (book.getPublishYear() == 0 || book.getPublishYear() == updateBook.getPublishYear()) {
+                System.out.println("Book publish year is either zero or unchanged, skipping update.");
+            } else {
+                updateBook.setPublishYear(book.getPublishYear());
+            }
+
+            // Check and handle publisher update
+            if (book.getPublisher() == null || book.getPublisher().isEmpty() || book.getPublisher().equals(updateBook.getPublisher())) {
+                System.out.println("Book publisher is either empty or unchanged, skipping update.");
+            } else {
+                updateBook.setPublisher(book.getPublisher());
+            }
+
+            // Check and handle categoryId update
+            if (book.getCategoryId() == 0 || book.getCategoryId() == updateBook.getCategoryId()) {
+                System.out.println("Book category ID is either zero or unchanged, skipping update.");
+            } else {
+                updateBook.setCategoryId(book.getCategoryId());
+            }
+        }
+
+        // Now ensure the existing book's ID is set in the entity
+        Book updateEntity = BookMapper.instance.toUpdateEntity(updateBook);
+        updateEntity.setId(id);  // Ensure the ID is set to the existing book's ID
+
+        return BookMapper.instance.toDTO(bookRepo.save(updateEntity));
+    }
+
+    public List<ResponseBookDTO> getAllBooks() {
+        List<Book> books = bookRepo.findAll();
+        return BookMapper.instance.toDTOList(books);
     }
 
     public ResponseBookDTO getBookById(int id) {

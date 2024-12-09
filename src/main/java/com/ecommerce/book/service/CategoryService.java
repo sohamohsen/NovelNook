@@ -9,7 +9,6 @@ import com.ecommerce.book.repository.CategoryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,11 +40,11 @@ public class CategoryService {
     }
 
     public List<ResponseCategoryDTO> getAllCategories() {
-        // Retrieve all categories
-        List<Category> categories = categoryRepo.findAll();
-
+        if (categoryRepo.findAll().isEmpty()) {
+            throw new IllegalArgumentException("No categories found");
+        }else
         // Map categories to DTOs
-        return CategoryMapper.instance.toResponseCategoryDTOList(categories);
+            return CategoryMapper.instance.toDTO(categoryRepo.findAll());
     }
 
     public ResponseCategoryDTO updateCategory(int id, UpdateCategoryDTO category) {
@@ -56,29 +55,15 @@ public class CategoryService {
         if (category.getName() == null || category.getName().isEmpty()) {
             throw new IllegalArgumentException("Category name cannot be null or empty");
         }
-
         // Check if the category exists
-        Optional<Category> existingCategoryOpt = categoryRepo.findById(id);
-
-        if (existingCategoryOpt.isPresent()) {
-            // If the category exists, update its fields
-            Category existingCategory = existingCategoryOpt.get();
-
-            // Map the data from UpdateCategoryDTO to the existing entity
-            existingCategory.setName(category.getName());
-            if (category.getDescription() != null) {
-                existingCategory.setDescription(category.getDescription());
-            }
-
-            // Save the updated category
-            Category updatedCategory = categoryRepo.save(existingCategory);
-
-            // Return the updated category as a DTO
-            return CategoryMapper.instance.toDTO(updatedCategory);
-        }
-
-        // If category doesn't exist, return null or handle differently
-        return null; // or you can return a default ResponseCategoryDTO
+        Category existingCategory = categoryRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category with ID " + id + " not found"));
+        // Map data from UpdateCategoryDTO to existing Category entity
+        CategoryMapper.instance.toUpdateEntity(category, existingCategory);
+        // Save the updated category
+        Category updatedCategory = categoryRepo.save(existingCategory);
+        // Return the updated category as a DTO
+        return CategoryMapper.instance.toDTO(updatedCategory);
     }
 
     public void deleteCategory(int id) {
@@ -90,6 +75,4 @@ public class CategoryService {
             categoryRepo.deleteById(id);
         }
     }
-
-
 }
