@@ -1,2 +1,2 @@
 ﻿# NovelNook
-# Springboot
+# Springboot | Java | postgressql
