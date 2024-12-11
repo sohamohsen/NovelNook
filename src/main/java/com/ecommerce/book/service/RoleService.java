@@ -18,9 +18,6 @@ public class RoleService {
     private RoleRepo roleRepo;
 
     public ResponseRoleDTO addRole(CreateRoleDTO role) {
-        if(role.getRole() == null || role.getRole().isEmpty()) {
-            throw new IllegalArgumentException("Role required");
-        }
         Role savedrole = RoleMapper.instance.toEntity(role);
         return RoleMapper.instance.toDTO(roleRepo.save(savedrole));
     }
@@ -29,21 +26,15 @@ public class RoleService {
         if (id <= 0) {
             throw new IllegalArgumentException("Role id cannot be null or empty");
         }
-        if(role.getRole() == null || role.getRole().isEmpty()) {
-            throw new IllegalArgumentException("Role required");
-        }
-// Check if the category exists
-        Role existingRole= roleRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role with ID " + id + " not found"));
-        RoleMapper.instance.toUpdateEntity(role, existingRole);
-        return RoleMapper.instance.toDTO(roleRepo.save(existingRole));
+            // Check if the category exists
+            Role existingRole = roleRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Role with ID " + id + " not found"));
+            RoleMapper.instance.toUpdateEntity(role, existingRole);
+            return RoleMapper.instance.toDTO(roleRepo.save(existingRole));
     }
 
     public List<ResponseRoleDTO> getRoles(){
-        if (roleRepo.findAll().isEmpty()) {
-            throw new IllegalArgumentException("No roles found");
-        }else
-            return RoleMapper.instance.toDTO(roleRepo.findAll());
+        return RoleMapper.instance.toDTO(roleRepo.findAll());
     }
 
     public ResponseRoleDTO getRoleById(int id) {

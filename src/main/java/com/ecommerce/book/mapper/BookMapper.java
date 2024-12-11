@@ -4,10 +4,10 @@ import com.ecommerce.book.dto.*;
 import com.ecommerce.book.entity.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public interface BookMapper {

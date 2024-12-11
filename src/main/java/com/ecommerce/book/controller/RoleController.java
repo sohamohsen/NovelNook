@@ -4,6 +4,7 @@ import com.ecommerce.book.dto.CreateRoleDTO;
 import com.ecommerce.book.dto.ResponseRoleDTO;
 import com.ecommerce.book.dto.UpdateRoleDTO;
 import com.ecommerce.book.service.RoleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,10 @@ public class RoleController {
     }
 
     @PutMapping("/updater/{id}")
-    public ResponseEntity<ResponseRoleDTO> updateRole(@PathVariable int id, @RequestBody UpdateRoleDTO role) {
+    public ResponseEntity<ResponseRoleDTO> updateRole(
+            @PathVariable int id,
+            @RequestBody @Valid UpdateRoleDTO role
+    ) {
         if(id<0){
             return ResponseEntity.badRequest().build();
         }else if(role == null) {

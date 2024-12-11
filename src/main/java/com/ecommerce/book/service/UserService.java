@@ -18,18 +18,12 @@ public class    UserService {
     private UserRepo userRepo;
 
     public ResponseUserDTO addUser(CreateUserDTO user) {
-        if (user.getName().isEmpty() || user.getPassword().isEmpty() || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("there is no data");
-        }
         User savedUser = UserMapper.instance.toEntity(user);
         return UserMapper.instance.toDTO(userRepo.save(savedUser));
     }
 
     public ResponseUserDTO updateUser(int id, UpdateUserDTO user) {
         if (id <= 0) {
-            throw new IllegalArgumentException("There is no data");
-        }
-        if (user == null) {
             throw new IllegalArgumentException("There is no data");
         }
 
@@ -78,16 +72,13 @@ public class    UserService {
         // Now ensure the existing user's ID is set in the entity
         User updateUser = UserMapper.instance.toUpdateEntity(updatedUser);
         updateUser.setId(id);  // Ensure the ID is set to the existing user's ID
-        updateUser.setCreationAt(existingUser.getCreationAt());
+//        updateUser.setCreationAt(existingUser.getCreationAt());
 
         // Save the updated user, this will update the existing user instead of creating a new one
         return UserMapper.instance.toDTO(userRepo.save(updateUser));
     }
 
     public List<ResponseUserDTO> getAllUsers() {
-        if (userRepo.findAll().isEmpty()) {
-            throw new IllegalArgumentException("there is no users");
-        }
         List<User> users = userRepo.findAll();
         return UserMapper.instance.toDTOList(users);
     }

@@ -20,10 +20,6 @@ public interface CategoryMapper {
 
     void toUpdateEntity(UpdateCategoryDTO updateCategoryDTO, @MappingTarget Category category);
 
-    // Map Category entity to CategoryWithBooksDTO
-    @Mapping(target = "books", source = "books") // Map books to ResponseBookDTO list
-    CategoryWithBooksDTO toCategoryWithBooksDTO(Category category);
-
     // Map Book entity to ResponseBookDTO
     List<ResponseCategoryDTO> toDTO(List<Category> categories);
 }

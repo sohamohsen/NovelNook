@@ -18,10 +18,6 @@ public class CategoryService {
     private CategoryRepo categoryRepo;
 
     public ResponseCategoryDTO addCategory(CreateCategoryDTO category) {
-        // Check if category name is null or empty
-        if (category.getName() == null || category.getName().isEmpty()) {
-            throw new IllegalArgumentException("Category name cannot be null or empty");
-        }
 
         // Convert DTO to Entity using MapStruct
         Category toEntity = CategoryMapper.instance.toEntity(category);
@@ -32,19 +28,11 @@ public class CategoryService {
 
     public ResponseCategoryDTO getCategoryById(int id) {
         Optional<Category> category = categoryRepo.findById(id);
-        // Handle the case when category is not found
-        if (category.isEmpty()) {
-            throw new IllegalArgumentException("Category with ID " + id + " not found");
-        }
         return CategoryMapper.instance.toDTO(category.get());
     }
 
     public List<ResponseCategoryDTO> getAllCategories() {
-        if (categoryRepo.findAll().isEmpty()) {
-            throw new IllegalArgumentException("No categories found");
-        }else
-        // Map categories to DTOs
-            return CategoryMapper.instance.toDTO(categoryRepo.findAll());
+        return CategoryMapper.instance.toDTO(categoryRepo.findAll());
     }
 
     public ResponseCategoryDTO updateCategory(int id, UpdateCategoryDTO category) {
@@ -52,10 +40,7 @@ public class CategoryService {
         if (id <= 0) {
             throw new IllegalArgumentException("Category id cannot be null or empty");
         }
-        if (category.getName() == null || category.getName().isEmpty()) {
-            throw new IllegalArgumentException("Category name cannot be null or empty");
-        }
-        // Check if the category exists
+                // Check if the category exists
         Category existingCategory = categoryRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category with ID " + id + " not found"));
         // Map data from UpdateCategoryDTO to existing Category entity
